@@ -1,0 +1,166 @@
+
+	       		
+			 USERNAME:system			  	~~~   PASSWORD:	***********
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2.	There are 3 roles in this database i.e. Director, Head and Teacher. 
+
+The role Director has access to all tables and has the credentials to all system and object privileges. Sam (Password: dean) is the Director. 
+The role Head can only update and see all data. Sheldon(Password: amy) is the Head. 
+The role Teacher can only see all data. Oliver(Password: twist), Emma (Password: henry) and Harry (Password: ginny) are all teachers.
+
+
+>>    CREATiNG USERS    <<
+--------------------------------------------------------------------------------------------------------------
+
+CREATE user 	SAM identified by DEAN;
+
+CREATE user 	SHELDON identified by AMY;
+
+CREATE user 	OLiVER identified by TWiST;
+CREATE user 	EMMA identified by HENRY;
+CREATE user 	HARRY identified by GiNNY;
+
+
+--------------------------------------------------------------------------------------------------------------
+>>    CREATiNG ROLES AND GRANTiNG OTHER PRiViLEGES    <<
+--------------------------------------------------------------------------------------------------------------
+
+CREATE ROLE 	DiRECTOR;
+GRANT	DiRECTOR TO	SAM;
+GRANT	connect, resource, unlimited tablespace 	to 	DiRECTOR;
+GRANT	ALL PRIVILEGE 	TO	SAM;
+
+CREATE ROLE 	HEAD;
+GRANT	HEAD TO		SHELDON;
+GRANT CONNECT, RESOURCE TO HEAD;
+
+
+CREATE ROLE 	TEACHER;
+GRANT	TEACHER TO	OLiVER, EMMA, HARRY;
+GRANT CONNECT, RESOURCE TO TEACHER;
+
+
+##	LOGOUT FROM SYSTEM AND LOGIN TO SAM        ##
+________________________________________________________________________________________________________________________________
+	       		
+			~~~  USERNAME:	SAM			  	~~~   PASSWORD:	DEAN
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1.	Create the tables given below with all given specifications and insert the given data in the created tables. 
+		Use sequences to create primary key values. Create one index for each table manually. Both tables must have a synonymous name.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+--------------------------------------------------------------------------------------------------------------
+>>    CREATiNG TABLES    <<
+--------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE DEPARTMENT
+           (
+                D_ID            NUMBER(2,0)        CONSTRAINT PK_DEPARTMENT PRIMARY KEY,
+                D_NAME      VARCHAR2(30)      NOT NULL
+           );
+
+
+CREATE TABLE TEACHER
+           (
+                T_ID            NUMBER(4,0)        CONSTRAINT PK_TEACHER PRIMARY KEY,
+                T_NAME      VARCHAR2(30)      NOT NULL,
+	T_SKILL      VARCHAR2(30),
+	D_ID	     NUMBER(2,0)	  CONSTRAINT FK_D_ID REFERENCES DEPARTMENT 
+           );
+
+
+
+--------------------------------------------------------------------------------------------------------------
+>>    CREATiNG SYNONYMS OF EXISTING TABLES    <<
+--------------------------------------------------------------------------------------------------------------
+
+CREATE SYNONYM        DEPT        FOR    DEPARTMENT;
+CREATE SYNONYM        TER         FOR     TEACHER;
+
+
+
+--------------------------------------------------------------------------------------------------------------
+>>    CREATiNG SEQUENCES FOR ONLY PRIMARY KEYS OF EACH TABLE    <<
+--------------------------------------------------------------------------------------------------------------
+
+CREATE    SEQUENCE        DEPT_D_ID
+			INCREMENT BY 1
+			START WITH 1;
+
+CREATE    SEQUENCE        TER_T_ID
+			INCREMENT BY 11
+			START WITH 11;
+
+
+>>    CREATiNG ONE INDEX FOR EACH TABLE    <<
+
+
+CREATE INDEX        D_N_i	       ON	DEPT(D_NAME);
+
+CREATE INDEX        T_SKiLL_i      ON	TER(T_SKILL);
+
+
+
+>>    INSERT DATA ON DEPT AND TER TABLE    <<
+
+>>> DEPARTMENT:
+
+	INSERT INTO DEPT VALUES ( 1,	'CS');
+	INSERT INTO DEPT VALUES ( 2,	'EEE');
+	INSERT INTO DEPT VALUES ( 3,	'BBA');
+	INSERT INTO DEPT VALUES ( 4,	'LAW');
+	INSERT INTO DEPT VALUES ( 5,	'ENGLISH');
+
+>>>TEACHER:
+
+	INSERT INTO TER VALUES ( 11,	'SAM',		'C',		1);
+	INSERT INTO TER VALUES ( 22,	'SHELDON',	'FiNANCE',	3);
+	INSERT INTO TER VALUES ( 33,	'OLiVER',		'CiRCUiTS',	2);
+	INSERT INTO TER VALUES ( 44,	'EMMA',		'CRiMiNOLOGY',	4);
+	INSERT INTO TER VALUES ( 55,	'HARRY',		'POETRY',	5);
+
+
+
+GRANT	SELECT	 ON	DEPT	TO	SHELDON;
+GRANT	SELECT	 ON	TER	TO	SHELDON;
+**********************
+GRANT	UPDATE (D_ID, D_NAME)
+ON	DEPT
+TO	SHELDON, HEAD;
+*******************
+GRANT	UPDATE (T_ID, T_NAME, T_SKILL)
+ON	TER
+TO	SHELDON, HEAD;
+*********************
+
+
+GRANT	SELECT	 ON	DEPT   TO	OLiVER, EMMA, HARRY;
+GRANT	SELECT	 ON	TER    TO		OLiVER, EMMA, HARRY;
+
+
+
+***********************************
+	LOGOUT FROM SAM AND LOGIN TO SCOTT        
+	       		
+			  USERNAME:	scott			  	  PASSWORD:	tiger
+
+
+3.	Create a complex view that displays the employee name and the name of the department they work in.
+
+
+
+CREATE VIEW	EMP_DEPT_VIEW	(EMPNAME, DEPTNAME, LOCATION)
+AS SELECT	E.EMPNAME, D.DEPTNAME, D.LOCATION
+FROM		EMPLOYEES E, DEPARTMENT D
+WHERE		E.EMPID = D.DEPTID
+group BY 	E.EMPNAME;
+
+	
